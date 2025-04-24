@@ -1,0 +1,302 @@
+# EMDiffuse Project Rules and Patterns
+
+## Code Organization
+
+1. **Module Structure**: The codebase is organized into modules that separate concerns and promote code reuse.
+   - `core`: Base classes and utilities.
+   - `models`: Diffusion model implementations.
+   - `data`: Dataset implementations.
+   - `config`: Configuration files.
+   - `RAFT`: Image registration and alignment.
+   - `3D-SR-Unet`: Alternative approach to vEMDiffuse.
+
+2. **File Naming Conventions**: Files are named according to their purpose and content.
+   - Model files: `<model_name>_model.py` (e.g., `EMDiffuse_model.py`).
+   - Network files: `<model_name>_network.py` (e.g., `EMDiffuse_network.py`).
+   - Dataset files: `dataset.py` with classes for different tasks.
+   - Configuration files: `<model_name>.json` (e.g., `EMDiffuse-n.json`).
+
+3. **Class Naming Conventions**: Classes are named according to their purpose and functionality.
+   - Model classes: `<ModelName>Model` (e.g., `EMDiffuseModel`).
+   - Network classes: `Network` or `<NetworkName>Network`.
+   - Dataset classes: `<DatasetName>Dataset` (e.g., `EMDiffusenDataset`).
+
+## Configuration Management
+
+1. **JSON Configuration Files**: Model and dataset settings are defined in JSON configuration files.
+   - Configuration files are located in the `config` directory.
+   - Each model variant has its own configuration file.
+   - Configuration files specify model architecture, training parameters, and dataset settings.
+
+2. **Command-Line Arguments**: Command-line arguments can override specific configuration parameters.
+   - `-c` or `--config`: Specify the configuration file.
+   - `-p` or `--phase`: Specify the phase (train or test).
+   - `-b` or `--batch_size`: Specify the batch size.
+   - `--gpu`: Specify the GPU IDs to use.
+   - `--path`: Specify the data path.
+   - `--lr`: Specify the learning rate.
+
+3. **Environment Variables**: Some settings can be controlled through environment variables.
+   - `CUDA_VISIBLE_DEVICES`: Control which GPUs are visible to the process.
+   - `KMP_DUPLICATE_LIB_OK`: Allow duplicate libraries (used by RAFT).
+
+## Development Workflow
+
+1. **Training Workflow**: The typical workflow for training a model is:
+   - Prepare data using the RAFT module for registration and alignment.
+   - Configure the model using a JSON configuration file.
+   - Train the model using the `run.py` script with appropriate arguments.
+   - Monitor training progress using TensorBoard.
+   - Evaluate the model on validation data.
+   - Save the best model checkpoint.
+
+2. **Inference Workflow**: The typical workflow for inference is:
+   - Prepare input data according to the model's requirements.
+   - Load a pre-trained model using the `run.py` script with the `-p test` flag.
+   - Run inference with configurable sampling steps.
+   - Visualize and save the results.
+
+3. **Development Workflow**: The typical workflow for development is:
+   - Implement new features or fix bugs in the appropriate module.
+   - Test the changes using the example notebooks or scripts.
+   - Document the changes in the appropriate README files.
+   - Update the memory bank files if necessary.
+
+## Documentation Standards
+
+1. **README Files**: Each module should have a README file explaining its purpose and functionality.
+   - Main README file with project overview and usage instructions.
+   - Module-specific README files with detailed documentation.
+   - Example-specific README files with usage instructions.
+
+2. **Code Comments**: Code should be well-commented to explain complex logic and algorithms.
+   - Function and class docstrings explaining purpose, parameters, and return values.
+   - Inline comments explaining complex logic.
+   - TODO comments for future improvements.
+
+3. **Example Notebooks**: Example notebooks should demonstrate how to use the models for various tasks.
+   - Step-by-step tutorials with explanations.
+   - Code examples with comments.
+   - Visualization of results.
+
+## Error Handling
+
+1. **Exception Handling**: Exceptions should be caught and handled appropriately.
+   - Use try-except blocks to catch and handle exceptions.
+   - Provide informative error messages.
+   - Log errors for debugging.
+
+2. **Input Validation**: User inputs should be validated to prevent errors.
+   - Check that required parameters are provided.
+   - Validate parameter types and values.
+   - Provide helpful error messages for invalid inputs.
+
+3. **Graceful Degradation**: The code should degrade gracefully when errors occur.
+   - Provide fallback options when possible.
+   - Clean up resources before exiting.
+   - Provide clear instructions for resolving errors.
+
+## Performance Considerations
+
+1. **GPU Acceleration**: The code should leverage GPU acceleration when available.
+   - Use PyTorch's CUDA support for GPU acceleration.
+   - Check for GPU availability before using CUDA.
+   - Provide fallback to CPU when GPU is not available.
+
+2. **Memory Efficiency**: The code should be memory-efficient, especially for large datasets.
+   - Use memory-efficient algorithms and data structures.
+   - Implement gradient checkpointing for memory-intensive models.
+   - Use mixed-precision training when appropriate.
+
+3. **Computation Speed**: The code should be optimized for speed, especially for training and inference.
+   - Use vectorized operations when possible.
+   - Implement efficient algorithms.
+   - Leverage hardware acceleration.
+
+## Testing and Validation
+
+1. **Model Validation**: Models should be validated on appropriate datasets.
+   - Use standard image quality metrics (PSNR, SSIM, FID).
+   - Compare with existing methods.
+   - Validate on different types of data.
+
+2. **Code Testing**: Code should be tested to ensure correctness and reliability.
+   - Implement unit tests for critical functions.
+   - Test edge cases and error conditions.
+   - Validate results against expected outputs.
+
+3. **User Testing**: The project should be tested by users to ensure usability and effectiveness.
+   - Gather feedback from users.
+   - Address usability issues.
+   - Incorporate user suggestions.
+
+## Collaboration and Contribution
+
+1. **Issue Tracking**: Issues and bugs should be tracked using GitHub issues.
+   - Provide detailed descriptions of issues.
+   - Include steps to reproduce.
+   - Assign priority and severity.
+
+2. **Pull Requests**: Contributions should be submitted as pull requests.
+   - Provide detailed descriptions of changes.
+   - Include tests for new features.
+   - Update documentation.
+
+3. **Code Reviews**: Code should be reviewed before merging.
+   - Check for correctness and adherence to standards.
+   - Provide constructive feedback.
+   - Ensure documentation is updated.
+
+## Deployment and Distribution
+
+1. **Package Management**: Dependencies should be managed using a requirements file.
+   - List all dependencies in `requirements.txt`.
+   - Specify version constraints when necessary.
+   - Document installation instructions.
+
+2. **Model Distribution**: Pre-trained models should be distributed through a reliable channel.
+   - Provide download links in the documentation.
+   - Include model metadata (architecture, training data, performance).
+   - Provide usage examples.
+
+3. **Documentation Distribution**: Documentation should be distributed with the code.
+   - Include README files in the repository.
+   - Provide example notebooks.
+   - Maintain a project website or wiki.
+
+## Project-Specific Patterns
+
+1. **Diffusion Model Pattern**: The diffusion models follow a specific pattern:
+   - Forward diffusion process for adding noise.
+   - Reverse diffusion process for generating images.
+   - UNet architecture for predicting noise.
+   - Noise scheduling and sampling strategies.
+
+2. **Data Loading Pattern**: Data loading follows a specific pattern:
+   - Dataset classes for loading and processing data.
+   - Dataloader for batching and shuffling.
+   - Data augmentation for improving generalization.
+   - Validation split for evaluating models.
+
+3. **Model Training Pattern**: Model training follows a specific pattern:
+   - Initialize model, optimizer, and scheduler.
+   - Load data and preprocess.
+   - Train for specified number of epochs.
+   - Validate on validation data.
+   - Save best model checkpoint.
+   - Log training progress.
+
+4. **Inference Pattern**: Inference follows a specific pattern:
+   - Load pre-trained model.
+   - Load input data and preprocess.
+   - Run inference with configurable sampling steps.
+   - Postprocess and save results.
+   - Visualize results.
+
+## User Preferences
+
+1. **Configuration Preferences**: Users may have preferences for configuration settings.
+   - Batch size: Adjust based on available GPU memory.
+   - Learning rate: Adjust based on training stability and convergence.
+   - Number of diffusion steps: Adjust based on inference speed and quality.
+   - Model architecture: Adjust based on task and data.
+
+2. **Workflow Preferences**: Users may have preferences for workflow.
+   - Command-line interface vs. Jupyter notebooks.
+   - TensorBoard vs. other visualization tools.
+   - Local vs. cluster deployment.
+   - Single-GPU vs. multi-GPU training.
+
+3. **Output Preferences**: Users may have preferences for output format and visualization.
+   - Image format: TIFF, PNG, JPEG, etc.
+   - Visualization style: Side-by-side comparison, overlay, etc.
+   - Metrics reporting: Tabular, graphical, etc.
+   - Log verbosity: Detailed vs. summary.
+
+## Critical Implementation Paths
+
+1. **Data Preparation Path**: The critical path for data preparation is:
+   - Load raw data.
+   - Register and align image pairs using RAFT.
+   - Crop patches for training.
+   - Apply data augmentation.
+   - Create dataset and dataloader.
+
+2. **Model Training Path**: The critical path for model training is:
+   - Initialize model, optimizer, and scheduler.
+   - Load data and preprocess.
+   - Forward pass through the model.
+   - Compute loss and gradients.
+   - Update model parameters.
+   - Validate on validation data.
+   - Save best model checkpoint.
+
+3. **Inference Path**: The critical path for inference is:
+   - Load pre-trained model.
+   - Load input data and preprocess.
+   - Initialize noise.
+   - Iteratively denoise using the model.
+   - Postprocess and save results.
+
+## Known Challenges
+
+1. **GPU Memory Constraints**: The models can be memory-intensive, especially for large images or volumes.
+   - Train on smaller patches and apply to larger images or volumes during inference.
+   - Implement memory-efficient algorithms and model compression techniques.
+   - Use gradient checkpointing and mixed-precision training.
+
+2. **Training Time**: Training the models can be time-consuming, especially for large datasets.
+   - Use pre-trained models or train on smaller datasets.
+   - Implement more efficient training algorithms.
+   - Leverage hardware acceleration and distributed training.
+
+3. **Data Preparation Complexity**: Preparing data for training can be complex, especially for custom datasets.
+   - Provide detailed documentation and examples for data preparation.
+   - Implement more automated data preparation tools.
+   - Simplify the data preparation process.
+
+## Evolution of Project Decisions
+
+1. **Model Architecture Evolution**: The model architecture has evolved over time.
+   - Started with basic UNet architecture.
+   - Added attention mechanisms for capturing long-range dependencies.
+   - Implemented 3D UNet for volumetric data.
+   - Explored aleatoric uncertainty estimation.
+
+2. **Training Strategy Evolution**: The training strategy has evolved over time.
+   - Started with basic diffusion training.
+   - Added noise scheduling and sampling strategies.
+   - Implemented EMA for model weights.
+   - Explored mixed-precision training.
+
+3. **Data Handling Evolution**: The data handling approach has evolved over time.
+   - Started with basic dataset loading.
+   - Added data augmentation for improving generalization.
+   - Implemented efficient data loading and processing.
+   - Explored distributed data loading.
+
+## Tool Usage Patterns
+
+1. **PyTorch Usage**: PyTorch is used for implementing neural networks and training.
+   - Define models using `nn.Module`.
+   - Use `DataLoader` for batching and shuffling.
+   - Use `optim` for optimization.
+   - Use `cuda` for GPU acceleration.
+
+2. **TensorBoard Usage**: TensorBoard is used for visualizing training progress.
+   - Log scalar values (loss, metrics) using `add_scalar`.
+   - Log images using `add_image`.
+   - Log histograms using `add_histogram`.
+   - Log text using `add_text`.
+
+3. **RAFT Usage**: RAFT is used for image registration and alignment.
+   - Load RAFT model.
+   - Compute optical flow between image pairs.
+   - Warp images based on flow.
+   - Extract aligned patches.
+
+4. **Configuration Usage**: JSON configuration files are used for model and dataset settings.
+   - Define model architecture, training parameters, and dataset settings.
+   - Override specific parameters using command-line arguments.
+   - Load configuration using the `parse` function.
+   - Initialize objects using the `init_obj` function.
