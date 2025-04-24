@@ -1,8 +1,8 @@
-from core.praser import init_obj
+from core.parser import init_obj
 import torch
 import warnings
 from core.logger import VisualWriter, InfoLogger
-import core.praser as Praser
+import core.parser as Parser
 import core.util as Util
 from data import define_dataloader
 
@@ -80,4 +80,3 @@ def create_EMDiffuse(opt):
         writer=phase_writer
     )
     return model
-

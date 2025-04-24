@@ -1,3 +1,15 @@
+"""
+Configuration Parser Module for EMDiffuse
+
+This module provides utilities for parsing configuration files, initializing objects,
+and managing file paths for the EMDiffuse project. It serves as a central configuration
+management system that allows for flexible model and dataset configuration.
+
+Author: EMDiffuse Team
+Date: April 2025
+License: See LICENSE file
+"""
+
 import os
 from collections import OrderedDict
 import json
@@ -12,8 +24,23 @@ import shutil
 def init_obj(opt, logger, *args, default_file_name='default file', given_module=None, init_type='Network',
              **modify_kwargs):
     """
-    finds a function handle with the name given as 'name' in config,
-    and returns the instance initialized with corresponding args.
+    Finds a function or class with the name given in the config and returns an initialized instance.
+    
+    This function dynamically imports and initializes objects (classes or functions) based on
+    configuration options. It's a key part of the factory pattern used throughout EMDiffuse.
+    
+    Args:
+        opt (dict or str): Configuration options containing the name and arguments for initialization.
+            If a string is provided, it's converted to a dict with the string as the 'name' key.
+        logger (InfoLogger): Logger instance for logging initialization information.
+        *args: Additional positional arguments to pass to the initialized object.
+        default_file_name (str): Default module name to import from if not specified in opt.
+        given_module (module, optional): Pre-imported module to use instead of importing.
+        init_type (str): Type of object being initialized (for logging purposes).
+        **modify_kwargs: Additional keyword arguments to override or add to those in opt.
+    
+    Returns:
+        object: Initialized instance of the specified class or partial function.
     """
     if opt is None or len(opt) < 1:
         logger.info('Option is None when initialize {}'.format(init_type))
@@ -53,6 +80,12 @@ def init_obj(opt, logger, *args, default_file_name='default file', given_module=
 
 
 def mkdirs(paths):
+    """
+    Create directories for the given paths.
+    
+    Args:
+        paths (str or list): Path or list of paths to create.
+    """
     if isinstance(paths, str):
         os.makedirs(paths, exist_ok=True)
     else:
@@ -61,22 +94,47 @@ def mkdirs(paths):
 
 
 def get_timestamp():
+    """
+    Get the current timestamp in a formatted string.
+    
+    Returns:
+        str: Formatted timestamp string (YYmmdd_HHMMSS).
+    """
     return datetime.now().strftime('%y%m%d_%H%M%S')
 
 
 def write_json(content, fname):
+    """
+    Write content to a JSON file.
+    
+    Args:
+        content (dict): Content to write to the JSON file.
+        fname (str): Path to the output JSON file.
+    """
     fname = Path(fname)
     with fname.open('wt') as handle:
         json.dump(content, handle, indent=4, sort_keys=False)
 
 
 class NoneDict(dict):
+    """
+    A dictionary subclass that returns None for missing keys instead of raising KeyError.
+    """
     def __missing__(self, key):
         return None
 
 
 def dict_to_nonedict(opt):
-    """ convert to NoneDict, which return None for missing key. """
+    """
+    Convert a nested dictionary to NoneDict, which returns None for missing keys.
+    
+    Args:
+        opt (dict, list, or other): The input to convert. If dict, converts to NoneDict.
+            If list, processes each element. Otherwise, returns as is.
+    
+    Returns:
+        NoneDict, list, or other: The converted structure.
+    """
     if isinstance(opt, dict):
         new_opt = dict()
         for key, sub_opt in opt.items():
@@ -89,7 +147,16 @@ def dict_to_nonedict(opt):
 
 
 def dict2str(opt, indent_l=1):
-    """ dict to string for logger """
+    """
+    Convert a nested dictionary to a formatted string for logging.
+    
+    Args:
+        opt (dict): The dictionary to convert.
+        indent_l (int): The indentation level to start with.
+    
+    Returns:
+        str: A formatted string representation of the dictionary.
+    """
     msg = ''
     for k, v in opt.items():
         if isinstance(v, dict):
@@ -102,10 +169,24 @@ def dict2str(opt, indent_l=1):
 
 
 def parse(args):
+    """
+    Parse configuration from a JSON file and command-line arguments.
+    
+    This function reads a JSON configuration file, processes it to remove comments,
+    and updates it with command-line arguments. It also sets up directories for
+    experiment results and code backup.
+    
+    Args:
+        args (argparse.Namespace): Command-line arguments.
+    
+    Returns:
+        NoneDict: A dictionary-like object containing the configuration with None for missing keys.
+    """
+    # Read and parse the JSON configuration file
     json_str = ''
     with open(args.config, 'r') as f:
         for line in f:
-            line = line.split('//')[0] + '\n'
+            line = line.split('//')[0] + '\n'  # Remove comments
             json_str += line
     opt = json.loads(json_str, object_pairs_hook=OrderedDict)
 

@@ -1,3 +1,15 @@
+"""
+Main Entry Point for EMDiffuse
+
+This module serves as the main entry point for the EMDiffuse project, handling command-line
+arguments, configuration parsing, and model execution. It supports both training and inference
+modes, as well as distributed training across multiple GPUs.
+
+Author: EMDiffuse Team
+Date: April 2025
+License: See LICENSE file
+"""
+
 import argparse
 import os
 import warnings
@@ -5,14 +17,24 @@ import torch
 import torch.multiprocessing as mp
 
 from core.logger import VisualWriter, InfoLogger
-import core.praser as Praser
+import core.parser as Parser
 import core.util as Util
 from data import define_dataloader
 from models import create_model, define_network, define_loss, define_metric
 
 
 def main_worker(gpu, ngpus_per_node, opt):
-    """  threads running on each GPU """
+    """
+    Main worker function that runs on each GPU for distributed training/inference.
+    
+    This function handles the setup for distributed training, initializes the model,
+    datasets, and other components, and runs the training or inference process.
+    
+    Args:
+        gpu (int): GPU ID for this worker.
+        ngpus_per_node (int): Number of GPUs per node.
+        opt (dict): Configuration options.
+    """
     if 'local_rank' not in opt:
         opt['local_rank'] = opt['global_rank'] = gpu
     if opt['distributed']:
@@ -64,7 +86,8 @@ def main_worker(gpu, ngpus_per_node, opt):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='EMDiffuse: A diffusion-based deep learning method for EM image enhancement')
     parser.add_argument('-c', '--config', type=str, default='config/EMDiffuse-n.json',
                         help='JSON file for configuration')
     parser.add_argument('--path', type=str, default=None, help='patch of cropped patches')
@@ -86,7 +109,7 @@ if __name__ == '__main__':
     ''' parser configs '''
     args = parser.parse_args()
 
-    opt = Praser.parse(args)
+    opt = Parser.parse(args)
 
     ''' cuda devices '''
     gpu_str = ','.join(str(x) for x in opt['gpu_ids'])
